@@ -7,6 +7,7 @@ target_sources(nes
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/bus.h
         ${CMAKE_CURRENT_LIST_DIR}/cpu.h
+        ${CMAKE_CURRENT_LIST_DIR}/nes.h
 )
 
 target_include_directories(nes

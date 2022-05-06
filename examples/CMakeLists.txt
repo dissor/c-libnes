@@ -12,7 +12,7 @@ target_include_directories(main
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
-target_link_directories(main
-    PRIVATE
+target_link_libraries(main
+    PUBLIC
         nes
 )
