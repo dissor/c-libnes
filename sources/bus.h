@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-05 20:40:09
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-06 22:10:39
+ * @LastEditTime: 2022-05-07 21:35:07
  * @FilePath: \c-libnes\sources\bus.h
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -11,17 +11,9 @@
 
 #pragma once
 
-#include <stdio.h>
 #include <stdint.h>
-#include <string.h>
-#include <stdbool.h>
 
-typedef struct
-{
-    uint8_t ram[64 * 1024];
-    void (*init)(void);
-    void (*deinit)(void);
-    void (*write)(uint16_t address, uint8_t data);
-    uint8_t (*read)(uint16_t address);
-} bus_type_t;
-extern bus_type_t bus;
+void WriteByte(uint16_t address, uint8_t data);
+void WriteWord(uint16_t address, uint16_t data);
+uint8_t ReadByte(uint16_t address);
+uint16_t ReadWord(uint16_t address);
