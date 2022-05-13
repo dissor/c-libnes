@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-05 20:39:43
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-08 22:31:55
+ * @LastEditTime: 2022-05-13 18:46:18
  * @FilePath: \c-libnes\examples\main.c
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -11,12 +11,23 @@
 #include "main.h"
 #include "nes.h"
 #include "SDL.h"
+#undef main
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-int WinMain(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
+    if( argc != 2 )
+    {
+        printf("ERROR!!!\r\n\tUsage: ./main.exe xxx.nes\r\n");
+        return -1;
+    }
+
+    NesLoad(argv[1]);
+
+    #if 0
+
     //将要渲染的窗口
     SDL_Window *window = NULL;
 
@@ -56,6 +67,7 @@ int WinMain(int argc, char *argv[])
 
     //退出 SDL subsystems
     SDL_Quit();
+    #endif
 
     return 0;
 }

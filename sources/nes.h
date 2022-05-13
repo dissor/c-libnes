@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-06 21:22:26
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-08 21:57:43
+ * @LastEditTime: 2022-05-13 10:02:59
  * @FilePath: \c-libnes\sources\nes.h
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -12,3 +12,4 @@
 
 #include "cpu.h"
 #include "bus.h"
+#include "rom.h"
