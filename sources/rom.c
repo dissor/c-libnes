@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-13 10:01:34
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-13 18:44:31
+ * @LastEditTime: 2022-05-15 22:54:57
  * @FilePath: \c-libnes\sources\rom.c
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "nes.h"
 
 NesHeader_t head;
 NesInfo_t info;
@@ -28,6 +29,7 @@ int8_t NesLoad(uint8_t *path)
         return -1;
     }
 
+    // get head
     // Header 16 bytes
     fread(&head, sizeof(head), 1, file);
 
@@ -37,24 +39,36 @@ int8_t NesLoad(uint8_t *path)
         return -2;
     }
 
-    if(head.Trainer)
+    if (head.Trainer)
     {
         fseek(file, 512, SEEK_CUR);
     }
 
-    info.PRG.Size = head.PRGSize*1024*16;
+    // get info
+    info.PRG.Size = head.PRGSize * 1024 * 16;
     info.PRG.Data = (uint8_t *)malloc(info.PRG.Size);
     fread(info.PRG.Data, info.PRG.Size, 1, file);
-    info.CHR.Size = head.CHRSize*1024*8;
+    info.CHR.Size = head.CHRSize * 1024 * 8;
     info.CHR.Data = (uint8_t *)malloc(info.CHR.Size);
     fread(info.CHR.Data, info.CHR.Size, 1, file);
 
-    info.MapperNum = (head.MapperHN<<4)|head.MapperLN;
+    info.MapperNum = (head.MapperHN << 4) | head.MapperLN;
     info.isVertical = head.MirrType;
     info.isScreen4 = head.Screen4;
     info.isBattery = head.BatMemory;
 
     NesHeaderPrintln();
+
+    printf(
+        "ROM: PRG-ROM: %d x 16kb   CHR-ROM %d x 8kb   Mapper: %03d\n",
+        head.PRGSize, head.CHRSize, (head.MapperHN << 4) | (head.MapperLN));
+
+    // reset cpu
+    reset();
+
+    printf(
+        "ROM: NMI: $%04X  RESET: $%04X  IRQ/BRK: $%04X\n",
+        ReadWord(0xFFFA), ReadWord(0xFFFC), ReadWord(0xFFFE));
 }
 
 void NesHeaderPrintln(void)

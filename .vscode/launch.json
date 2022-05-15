@@ -10,7 +10,7 @@
             "request": "launch",
             // "program": "输入程序名称，例如 ${workspaceFolder}/a.exe",
             "program": "${workspaceFolder}/build/examples/main.exe",
-            "args": [],
+            "args": ["C:\\Users\\mylk\\Desktop\\NES\\c-libnes\\nestest.nes"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

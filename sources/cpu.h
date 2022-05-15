@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-05 20:40:22
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-07 21:36:26
+ * @LastEditTime: 2022-05-15 22:34:06
  * @FilePath: \c-libnes\sources\cpu.h
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -11,3 +11,4 @@
 #pragma once
 
 #include "bus.h"
+void reset(void);
