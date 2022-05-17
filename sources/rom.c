@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-13 10:01:34
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-15 22:54:57
+ * @LastEditTime: 2022-05-17 22:22:28
  * @FilePath: \c-libnes\sources\rom.c
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -69,6 +69,8 @@ int8_t NesLoad(uint8_t *path)
     printf(
         "ROM: NMI: $%04X  RESET: $%04X  IRQ/BRK: $%04X\n",
         ReadWord(0xFFFA), ReadWord(0xFFFC), ReadWord(0xFFFE));
+
+    disassemble(ReadWord(0xFFFC), ReadWord(0xFFFC)+2);
 }
 
 void NesHeaderPrintln(void)

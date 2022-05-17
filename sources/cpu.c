@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-05 20:40:18
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-16 22:01:25
+ * @LastEditTime: 2022-05-17 22:20:52
  * @FilePath: \c-libnes\sources\cpu.c
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -10,6 +10,7 @@
  */
 #include "cpu.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 // 1. register
 
@@ -1366,6 +1367,7 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
         uint8_t opcode = read(addr);
         addr++;
         // sInst += lookup[opcode].name + " ";
+        printf("%s\n", lookup[opcode].name);
 
         // Get oprands from desired locations, and form the
         // instruction based upon its addressing mode. These
