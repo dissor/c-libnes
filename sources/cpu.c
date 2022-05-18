@@ -2,7 +2,7 @@
  * @Author: dissor
  * @Date: 2022-05-05 20:40:18
  * @LastEditors: dissor
- * @LastEditTime: 2022-05-17 22:20:52
+ * @LastEditTime: 2022-05-19 00:03:22
  * @FilePath: \c-libnes\sources\cpu.c
  * @Description:
  * guojianwenjonas@foxmail.com
@@ -16,11 +16,11 @@
 
 typedef struct
 {
+    uint16_t PC; // Program Counter
     uint8_t A;   // Accumulator Register
     uint8_t X;   // X Register
     uint8_t Y;   // Y Register
     uint8_t SP;  // Stack Pointer (points to location on bus)
-    uint16_t PC; // Program Counter
     union        // Status Register
     {
         struct
@@ -93,7 +93,6 @@ void SetFlag(uint8_t bit, bool v)
 
 // 2. 中断
 
-
 /**
  * @description: 不可屏蔽中断，该中断不能通过 P 的 I 标志屏蔽，所以它一定能触发。比如 PPU 在进入 VBlank 时就会产生 NMI 中断
  * @param {*}
@@ -151,7 +150,6 @@ void reset(void)
     cycles = 8;
 }
 
-
 /**
  * @description: 复位中断，RESET 按钮按下后或者系统刚上电时产生
  * @param {*}
@@ -186,8 +184,6 @@ void irq(void)
         cycles = 7;
     }
 }
-
-
 
 // Perform one clock cycles worth of emulation
 void clock(void)
@@ -1299,7 +1295,6 @@ uint8_t XXX(void)
     return 0;
 }
 
-
 struct INSTRUCTION lookup[] =
 {
     { "BRK",  BRK,  IMM, 7 },{ "ORA",  ORA,  IZX, 6 },{ "???",  XXX,  IMP, 2 },{ "???",  XXX,  IMP, 8 },{ "???",  NOP,  IMP, 3 },{ "ORA",  ORA,  ZP0, 3 },{ "ASL",  ASL,  ZP0, 5 },{ "???",  XXX,  IMP, 5 },{ "PHP",  PHP,  IMP, 3 },{ "ORA",  ORA,  IMM, 2 },{ "ASL",  ASL,  IMP, 2 },{ "???",  XXX,  IMP, 2 },{ "???",  NOP,  IMP, 4 },{ "ORA",  ORA,  ABS, 4 },{ "ASL",  ASL,  ABS, 6 },{ "???",  XXX,  IMP, 6 },
@@ -1322,9 +1317,8 @@ struct INSTRUCTION lookup[] =
 
 bool complete(void)
 {
-	return cycles == 0;
+    return cycles == 0;
 }
-
 
 // This is the disassembly function. Its workings are not required for emulation.
 // It is merely a convenience function to turn the binary instruction code into
@@ -1337,9 +1331,11 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
     uint16_t mapLines;
     uint16_t line_addr = 0;
 
-    // // A convenient utility to convert variables into
-    // // hex strings because "modern C++"'s method with
-    // // streams is atrocious
+    FILE *flog = fopen("log.txt", "wb");
+
+    // A convenient utility to convert variables into
+    // hex strings because "modern C++"'s method with
+    // streams is atrocious
     // auto hex = [](uint32_t n, uint8_t d)
     // {
     //     std::string s(d, '0');
@@ -1360,14 +1356,13 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
     {
         line_addr = addr;
 
-        // // Prefix line with instruction address
-        // std::string sInst = "$" + hex(addr, 4) + ": ";
+        // Prefix line with instruction address
+        fprintf(flog, "$%04X: ", addr); // std::string sInst = "$" + hex(addr, 4) + ": ";
 
         // Read instruction, and get its readable name
         uint8_t opcode = read(addr);
         addr++;
-        // sInst += lookup[opcode].name + " ";
-        printf("%s\n", lookup[opcode].name);
+        fprintf(flog, "$%s ", lookup[opcode].name); // sInst += lookup[opcode].name + " ";
 
         // Get oprands from desired locations, and form the
         // instruction based upon its addressing mode. These
@@ -1376,48 +1371,48 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
         // instruction
         if (lookup[opcode].addrmode == &IMP)
         {
-            // sInst += " {IMP}";
+            fprintf(flog, " {IMP}\n", addr); // sInst += " {IMP}";
         }
         else if (lookup[opcode].addrmode == &IMM)
         {
             value = read(addr);
             addr++;
-            // sInst += "#$" + hex(value, 2) + " {IMM}";
+            fprintf(flog, "#$%02X {IMM}\n", value); // sInst += "#$" + hex(value, 2) + " {IMM}";
         }
         else if (lookup[opcode].addrmode == &ZP0)
         {
             lo = read(addr);
             addr++;
             hi = 0x00;
-            // sInst += "$" + hex(lo, 2) + " {ZP0}";
+            fprintf(flog, "$%02X {ZP0}\n", lo); // sInst += "$" + hex(lo, 2) + " {ZP0}";
         }
         else if (lookup[opcode].addrmode == &ZPX)
         {
             lo = read(addr);
             addr++;
             hi = 0x00;
-            // sInst += "$" + hex(lo, 2) + ", X {ZPX}";
+            fprintf(flog, "$%02X X {ZPX}\n", lo); // sInst += "$" + hex(lo, 2) + ", X {ZPX}";
         }
         else if (lookup[opcode].addrmode == &ZPY)
         {
             lo = read(addr);
             addr++;
             hi = 0x00;
-            // sInst += "$" + hex(lo, 2) + ", Y {ZPY}";
+            fprintf(flog, "$%02X Y {ZPY}\n", lo); // sInst += "$" + hex(lo, 2) + ", Y {ZPY}";
         }
         else if (lookup[opcode].addrmode == &IZX)
         {
             lo = read(addr);
             addr++;
             hi = 0x00;
-            // sInst += "($" + hex(lo, 2) + ", X) {IZX}";
+            fprintf(flog, "($%02X X) {IZX}\n", lo); // sInst += "($" + hex(lo, 2) + ", X) {IZX}";
         }
         else if (lookup[opcode].addrmode == &IZY)
         {
             lo = read(addr);
             addr++;
             hi = 0x00;
-            // sInst += "($" + hex(lo, 2) + "), Y {IZY}";
+            fprintf(flog, "($%02X Y {IZY}\n", lo); // sInst += "($" + hex(lo, 2) + "), Y {IZY}";
         }
         else if (lookup[opcode].addrmode == &ABS)
         {
@@ -1425,7 +1420,7 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
             addr++;
             hi = read(addr);
             addr++;
-            // sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + " {ABS}";
+            fprintf(flog, "$%04X {ABS}\n", (uint16_t)(hi << 8) | lo); // sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + " {ABS}";
         }
         else if (lookup[opcode].addrmode == &ABX)
         {
@@ -1433,7 +1428,7 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
             addr++;
             hi = read(addr);
             addr++;
-            // sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", X {ABX}";
+            fprintf(flog, "$%04X X {ABX}\n", (uint16_t)(hi << 8) | lo); // sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", X {ABX}";
         }
         else if (lookup[opcode].addrmode == &ABY)
         {
@@ -1441,7 +1436,7 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
             addr++;
             hi = read(addr);
             addr++;
-            // sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", Y {ABY}";
+            fprintf(flog, "$%04X Y {ABY}\n", (uint16_t)(hi << 8) | lo); // sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", Y {ABY}";
         }
         else if (lookup[opcode].addrmode == &IND)
         {
@@ -1449,19 +1444,19 @@ uint16_t disassemble(uint16_t nStart, uint16_t nStop)
             addr++;
             hi = read(addr);
             addr++;
-            // sInst += "($" + hex((uint16_t)(hi << 8) | lo, 4) + ") {IND}";
+            fprintf(flog, "($%04X ) {IND}\n", (uint16_t)(hi << 8) | lo); // sInst += "($" + hex((uint16_t)(hi << 8) | lo, 4) + ") {IND}";
         }
         else if (lookup[opcode].addrmode == &REL)
         {
             value = read(addr);
             addr++;
-            // sInst += "$" + hex(value, 2) + " [$" + hex(addr + value, 4) + "] {REL}";
+            fprintf(flog, "$%02X [$%04X] {REL}\n", value, addr + value); // sInst += "$" + hex(value, 2) + " [$" + hex(addr + value, 4) + "] {REL}";
         }
 
-        // // Add the formed string to a std::map, using the instruction's
-        // // address as the key. This makes it convenient to look for later
-        // // as the instructions are variable in length, so a straight up
-        // // incremental index is not sufficient.
+        // Add the formed string to a std::map, using the instruction's
+        // address as the key. This makes it convenient to look for later
+        // as the instructions are variable in length, so a straight up
+        // incremental index is not sufficient.
         // mapLines[line_addr] = sInst;
     }
 
